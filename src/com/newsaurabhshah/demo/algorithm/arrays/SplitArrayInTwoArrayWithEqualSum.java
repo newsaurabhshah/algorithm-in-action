@@ -52,7 +52,7 @@ public class SplitArrayInTwoArrayWithEqualSum {
 		for (int i = 0; i < reducedArray.length - 1 && !found; i++) {
 			temp = reducedArray[i];
 			for (j = i + 1; j < reducedArray.length; j++) {
-				if (isCombinationPossible(temp, reducedArray[j])) {
+				if (_isCombinationPossible(temp, reducedArray[j])) {
 					System.out.println("Solution");
 					System.out.println(Arrays.toString(temp));
 					System.out.println(" and ");
@@ -121,6 +121,28 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	}
 
 	/**
+	 * This method is used to find in any element of array a is present in b
+	 * 
+	 * @param a the array element of which have to be searched
+	 * @param b the array in which the elements have to be searched
+	 * @return true if no element of a is in b
+	 */
+	private static boolean _isCombinationPossible(int a[], int b[]) {
+		List<Integer> secondary = new ArrayList<Integer>();
+		for (int index = 0; index < b.length; index++) {
+			secondary.add(b[index]);
+		}
+		// System.out.println("Comparing "+Arrays.toString(a)+" "+secondary);
+		for (int i : a) {
+			// System.out.println("Is "+i+" in "+secondary+" "+secondary.contains(i));
+			if (secondary.contains(i)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * This method is used to find the max column length in an 2d array
 	 * 
 	 * @param array the 2d Array for which the max column size has to be found
@@ -137,7 +159,7 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	}
 
 	/**
-	 * This method is used to calculate the sum of all value in an integer
+	 * This method is used to calculate the sum of all value in an integer array
 	 * 
 	 * @param a the array of integer for which sum has to be found
 	 * @return the sum of the array
@@ -164,28 +186,6 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	private static boolean _verifyTarget(Integer target, int[] temp) {
 		if (target != null) {
 			if (_sum(temp) != target) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
-	 * This method is used to find in any element of array a is present in b
-	 * 
-	 * @param a the array element of which have to be searched
-	 * @param b the array in which the elements have to be searched
-	 * @return true if no element of a is in b
-	 */
-	private static boolean isCombinationPossible(int a[], int b[]) {
-		List<Integer> secondary = new ArrayList<Integer>();
-		for (int index = 0; index < b.length; index++) {
-			secondary.add(b[index]);
-		}
-		// System.out.println("Comparing "+Arrays.toString(a)+" "+secondary);
-		for (int i : a) {
-			// System.out.println("Is "+i+" in "+secondary+" "+secondary.contains(i));
-			if (secondary.contains(i)) {
 				return false;
 			}
 		}
