@@ -1,19 +1,22 @@
 package com.newsaurabhshah.demo.algorithm.arrays;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * This project is aimed to split array in to two array with equal sum and no common member in the solution
  * 
  * Please check the main method
  * 
- * Updates Removed Reduce Method and integrated with Map Method to improve efficiency
+ * Updates Removed the combination and check approach. The algo now searches for first combination and then it's anti
+ * 
+ * 
  * 
  * @author Saurabh S Shah
- * @version 1.1
- * @build Feb 27, 2014
+ * @reference Vikram Jit Singh
+ * @version 2
+ * @build Feb 28, 2014
  */
 public class SplitArrayInTwoArrayWithEqualSum {
 
@@ -40,106 +43,81 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	}
 
 	/**
-	 * This method is used to find first combination of array where the 1's array set element is not present in 2nd
-	 * array set
+	 * This method generates the anti set of the selected array from source.
 	 * 
-	 * @param reducedArray the array in which all rows have equal sum
+	 * Antiset is the set where numbers present in selected are removed from source.
+	 * 
+	 * @param source the array from which selected array's number have to be removed
+	 * @param selected the array which has to be removed from source
 	 */
-	private static void _findFirstCombinationSolution(int[][] reducedArray) {
-		int j;
-		int[] temp;
-		boolean found = false;
-		for (int i = 0; i < reducedArray.length - 1 && !found; i++) {
-			temp = reducedArray[i];
-			for (j = i + 1; j < reducedArray.length; j++) {
-				if (_isCombinationPossible(temp, reducedArray[j])) {
-					System.out.println("Solution");
-					System.out.println(Arrays.toString(temp));
-					System.out.println(" and ");
-					System.out.println(Arrays.toString(reducedArray[j]));
-					System.out.println(">>>>>");
-					found = true;
-					break;
-				}
-			}
+	private static void _generateAnti(int[] source, int[] selected) {
+		Set<Integer> sourceSet = new HashSet<>();
+		for (int a : source) {
+			sourceSet.add(a);
 		}
-		if (!found) {
-			System.out.println("No Solution Possible without repetition");
+		for (int a : selected) {
+			sourceSet.remove(a);
 		}
+		System.out.println("Anti Set :" + sourceSet.toString());
 	}
 
 	/**
-	 * This method is used to find all possible combination of the array
+	 * This method is used to find the first possible combination of the array which has sum as target othher wise it
+	 * sends back all possible combination
 	 * 
 	 * <b> Uses recursion. May Lead to Java Heap overflow if the array is too large
 	 * 
 	 * @param myarray the single dimension array containing the set of number for which all combination have to be found
+	 * @param startingPoint
 	 * @param target the sum that has to be achieved for the array to be valid. If null it is disregarded and all the
 	 *            possible combination of the array is added to result
-	 * @return all possible combinations in a 2d array
+	 * @return all possible combination if target is null or if target is not met by ant combination else sends back the
+	 *         first solution
 	 */
-	private static int[][] _generateAllPossibleValidCombination(int[] myarray, Integer target) {
-		if (myarray.length == 0) {
-			int[][] result = { { 0 } };
-			return result;
-		}
-		if (myarray.length == 1) {
-			int[][] result = { { myarray[0] } };
+	private static int[][] _generateFirstCombination(int[] myarray, int startingPoint, Integer target) {
+		if (myarray.length - startingPoint == 1) {
+			int[][] result = { { myarray[startingPoint] } };
 			return result;
 		}
 		// Get all combination of Spliced array except the first number
-		int[][] result = _generateAllPossibleValidCombination(Arrays.copyOfRange(
-				myarray, 1, myarray.length), null); // Splice
+		int[][] result = _generateFirstCombination(myarray, startingPoint + 1, null); // Splice
 		int[][] result2 = new int[(result.length * 2) + 1][_maxColLenght(result) + 1];
 		int i, k;
 		int temp[];
 		// To the solution add this number
 		k = 0;
 		for (i = 0; i < result.length; i++) {
-			temp = _addAll(new int[] { myarray[0] }, result[i]);
-			if (_verifyTarget(target, temp)) {
-				result2[k] = temp;
-				k++;
+			temp = _addAll(new int[] { myarray[startingPoint] }, result[i]);
+			if (target != null && _sum(temp) == target) {
+				result2 = new int[1][temp.length];
+				result2[0] = temp;
+				return result2;
 			}
-		}
-		// Single entry for this number
-		temp = new int[] { myarray[0] };
-		if (_verifyTarget(target, temp)) {
 			result2[k] = temp;
 			k++;
 		}
+		// Single entry for this number
+		temp = new int[] { myarray[startingPoint] };
+		if (target != null && _sum(temp) == target) {
+			result2 = new int[1][temp.length];
+			result2[0] = temp;
+			return result2;
+		}
+		result2[k] = temp;
+		k++;
 		int j;
 		// Copy Original Combination
 		for (j = 0; j < result.length; j++) {
 			temp = result[j];
-			if (_verifyTarget(target, temp)) {
-				result2[k] = temp;
-				k++;
+			if (target != null && _sum(temp) == target) {
+				result2 = new int[1][temp.length];
+				result2[0] = temp;
+				return result2;
 			}
+			result2[k] = temp;
+			k++;
 		}
 		return result2;
-	}
-
-	/**
-	 * This method is used to find in any element of array a is present in b
-	 * 
-	 * @param a the array element of which have to be searched
-	 * @param b the array in which the elements have to be searched
-	 * @return true if no element of a is in b
-	 */
-	private static boolean _isCombinationPossible(int a[], int b[]) {
-		List<Integer> secondary = new ArrayList<Integer>();
-		for (int index = 0; index < b.length; index++) {
-			secondary.add(b[index]);
-		}
-		// System.out.println("Comparing "+Arrays.toString(a)+" "+secondary);
-		for (int i : a) {
-			// System.out.println("Is "+i+" in "+secondary+" "+secondary.contains(i));
-			if (secondary.contains(i)) {
-				return false;
-			}
-		}
-		return true;
 	}
 
 	/**
@@ -173,53 +151,36 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	}
 
 	/**
-	 * 
-	 * This method is used to verify that the sum of array is equal to target or not.
-	 * 
-	 * To disregard send target as null.
-	 * 
-	 * @param target the expected sum of the temp array to be a vaild case. if it is null the case is expected as a
-	 *            valid case.
-	 * @param temp the array to be verified
-	 * @return true if target is null or if target is not null then sum of temp should be equal to target
-	 */
-	private static boolean _verifyTarget(Integer target, int[] temp) {
-		if (target != null) {
-			if (_sum(temp) != target) {
-				return false;
-			}
-		}
-		return true;
-	}
-
-	/**
 	 * This is the entry point for the demo console application
 	 * 
 	 * @param args command line args
 	 */
 	public static void main(String[] args) {
 		// limit is the the size of the array to be split
-		int limit = 22;
-		int a[] = new int[limit];
-		for (int i = 0; i < limit; i++) {
-			a[i] = i * 2;
-		}
+
+		/*
+		 * int limit = 2; int a[] = new int[limit]; for (int i = 0; i < limit; i++) { a[i] = (i + 1) * 2; }
+		 */
+
 		// Standard Test Array Used
-		// int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		long startTime = System.nanoTime();
 		int sumA = _sum(a);
-		if (sumA % 2 != 0) {
+		if (sumA % 2 != 0 || a.length == 1) {
 			System.out.println("Not Possible!");
 			return;
 		}
-		// Map: Form All the valid Combination Tree
-		int[][] combination = _generateAllPossibleValidCombination(a, sumA / 2);
-		System.out.println("Valid " + combination.length + " Combinations found. Now looking for solution pair.");
-		// Query: Find First Solution
-		_findFirstCombinationSolution(combination);
+
+		int[][] combination = _generateFirstCombination(a, 0, sumA / 2);
+
+		if (combination.length > 1) {
+			System.out.println("Not Possible!");
+		} else {
+			System.out.println("Solution 1 :" + Arrays.toString(combination[0]));
+			_generateAnti(a, combination[0]);
+		}
 		long endTime = System.nanoTime();
 		long timeTaken = (endTime - startTime);
 		System.out.println("Took " + timeTaken + " ns or " + (double) timeTaken / 1000000000 + " sec");
 	}
-
 }
