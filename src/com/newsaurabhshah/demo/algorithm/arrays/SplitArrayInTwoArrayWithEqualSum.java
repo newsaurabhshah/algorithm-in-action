@@ -198,7 +198,14 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 * @param args command line args
 	 */
 	public static void main(String[] args) {
-		int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		// limit is the the size of the array to be split
+		int limit = 22;
+		int a[] = new int[limit];
+		for (int i = 0; i < limit; i++) {
+			a[i] = i * 2;
+		}
+		// Standard Test Array Used
+		// int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		long startTime = System.nanoTime();
 		int sumA = _sum(a);
 		if (sumA % 2 != 0) {
@@ -207,6 +214,7 @@ public class SplitArrayInTwoArrayWithEqualSum {
 		}
 		// Map: Form All the valid Combination Tree
 		int[][] combination = _generateAllPossibleValidCombination(a, sumA / 2);
+		System.out.println("Valid " + combination.length + " Combinations found. Now looking for solution pair.");
 		// Query: Find First Solution
 		_findFirstCombinationSolution(combination);
 		long endTime = System.nanoTime();
