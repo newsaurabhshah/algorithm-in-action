@@ -68,7 +68,8 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 * <b> Uses recursion. May Lead to Java Heap overflow if the array is too large
 	 * 
 	 * @param myarray the single dimension array containing the set of number for which all combination have to be found
-	 * @param startingPoint
+	 * @param startingPoint this is the starting point from where the method would start finding combination from. For
+	 *            external call it should be 0 unless specifically required
 	 * @param target the sum that has to be achieved for the array to be valid. If null it is disregarded and all the
 	 *            possible combination of the array is added to result
 	 * @return all possible combination if target is null or if target is not met by ant combination else sends back the
@@ -158,12 +159,14 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	public static void main(String[] args) {
 		// limit is the the size of the array to be split
 
-		/*
-		 * int limit = 2; int a[] = new int[limit]; for (int i = 0; i < limit; i++) { a[i] = (i + 1) * 2; }
-		 */
+		int limit = 23;
+		int a[] = new int[limit];
+		for (int i = 0; i < limit; i++) {
+			a[i] = (i + 1) * 2;
+		}
 
 		// Standard Test Array Used
-		int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		// int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 		long startTime = System.nanoTime();
 		int sumA = _sum(a);
 		if (sumA % 2 != 0 || a.length == 1) {
