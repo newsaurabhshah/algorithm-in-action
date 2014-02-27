@@ -9,8 +9,10 @@ import java.util.List;
  * 
  * Please check the main method
  * 
+ * Updates Removed Reduce Method and integrated with Map Method to improve efficiency
+ * 
  * @author Saurabh S Shah
- * @version 1
+ * @version 1.1
  * @build Feb 27, 2014
  */
 public class SplitArrayInTwoArrayWithEqualSum {
@@ -25,7 +27,7 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 * @param array2 the second array whose elements are added to the new array.
 	 * @return The new long[] array.
 	 */
-	public static int[] addAll(int[] array1, int[] array2) {
+	public static int[] _addAll(int[] array1, int[] array2) {
 		if (array1 == null)
 			return array2.clone();
 		if (array2 == null) {
@@ -43,7 +45,7 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 * 
 	 * @param reducedArray the array in which all rows have equal sum
 	 */
-	private static void findFirstCombinationSolution(int[][] reducedArray) {
+	private static void _findFirstCombinationSolution(int[][] reducedArray) {
 		int j;
 		int[] temp;
 		boolean found = false;
@@ -72,9 +74,11 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 * <b> Uses recursion. May Lead to Java Heap overflow if the array is too large
 	 * 
 	 * @param myarray the single dimension array containing the set of number for which all combination have to be found
+	 * @param target the sum that has to be achieved for the array to be valid. If null it is disregarded and all the
+	 *            possible combination of the array is added to result
 	 * @return all possible combinations in a 2d array
 	 */
-	private static int[][] generateAllPossibleCombination(int[] myarray) {
+	private static int[][] _generateAllPossibleValidCombination(int[] myarray, Integer target) {
 		if (myarray.length == 0) {
 			int[][] result = { { 0 } };
 			return result;
@@ -84,24 +88,86 @@ public class SplitArrayInTwoArrayWithEqualSum {
 			return result;
 		}
 		// Get all combination of Spliced array except the first number
-		int[][] result = generateAllPossibleCombination(Arrays.copyOfRange(
-				myarray, 1, myarray.length)); // Splice
-		int[][] result2 = new int[(result.length * 2) + 1][maxColLenght(result) + 1];
-		int i;
+		int[][] result = _generateAllPossibleValidCombination(Arrays.copyOfRange(
+				myarray, 1, myarray.length), null); // Splice
+		int[][] result2 = new int[(result.length * 2) + 1][_maxColLenght(result) + 1];
+		int i, k;
+		int temp[];
 		// To the solution add this number
+		k = 0;
 		for (i = 0; i < result.length; i++) {
-			result2[i] = addAll(new int[] { myarray[0] }, result[i]);
+			temp = _addAll(new int[] { myarray[0] }, result[i]);
+			if (_verifyTarget(target, temp)) {
+				result2[k] = temp;
+				k++;
+			}
 		}
 		// Single entry for this number
-		result2[i] = new int[] { myarray[0] };
-		i++;
+		temp = new int[] { myarray[0] };
+		if (_verifyTarget(target, temp)) {
+			result2[k] = temp;
+			k++;
+		}
 		int j;
 		// Copy Original Combination
 		for (j = 0; j < result.length; j++) {
-			result2[i] = result[j];
-			i++;
+			temp = result[j];
+			if (_verifyTarget(target, temp)) {
+				result2[k] = temp;
+				k++;
+			}
 		}
 		return result2;
+	}
+
+	/**
+	 * This method is used to find the max column length in an 2d array
+	 * 
+	 * @param array the 2d Array for which the max column size has to be found
+	 * @return the max column length in an array 0 if the array is empty
+	 */
+	private static int _maxColLenght(int[][] array) {
+		int max = 0;
+		for (int[] j : array) {
+			if (max <= j.length) {
+				max = j.length;
+			}
+		}
+		return max;
+	}
+
+	/**
+	 * This method is used to calculate the sum of all value in an integer
+	 * 
+	 * @param a the array of integer for which sum has to be found
+	 * @return the sum of the array
+	 */
+	private static int _sum(int a[]) {
+		int sum = 0;
+		for (int k : a) {
+			sum += k;
+		}
+		return sum;
+	}
+
+	/**
+	 * 
+	 * This method is used to verify that the sum of array is equal to target or not.
+	 * 
+	 * To disregard send target as null.
+	 * 
+	 * @param target the expected sum of the temp array to be a vaild case. if it is null the case is expected as a
+	 *            valid case.
+	 * @param temp the array to be verified
+	 * @return true if target is null or if target is not null then sum of temp should be equal to target
+	 */
+	private static boolean _verifyTarget(Integer target, int[] temp) {
+		if (target != null) {
+			if (_sum(temp) != target) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -133,66 +199,15 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 */
 	public static void main(String[] args) {
 		int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
-		int sumA = sum(a);
+		int sumA = _sum(a);
 		if (sumA % 2 != 0) {
 			System.out.println("Not Possible!");
 			return;
 		}
-		// Map: Form All Combination Tree
-		int[][] combination = generateAllPossibleCombination(a);
-		// Reduce: Reduce Tree to Possible Solution
-		int[][] reducedCombination = reduceAsPerTarget(combination, sumA / 2);
+		// Map: Form All the valid Combination Tree
+		int[][] combination = _generateAllPossibleValidCombination(a, sumA / 2);
 		// Query: Find First Solution
-		findFirstCombinationSolution(reducedCombination);
-	}
-
-	/**
-	 * This method is used to find the max column length in an 2d array
-	 * 
-	 * @param array the 2d Array for which the max column size has to be found
-	 * @return the max column length in an array 0 if the array is empty
-	 */
-	private static int maxColLenght(int[][] array) {
-		int max = 0;
-		for (int[] j : array) {
-			if (max <= j.length) {
-				max = j.length;
-			}
-		}
-		return max;
-	}
-
-	/**
-	 * This method reduces the all possible combination to only those combination which have sum equal to target
-	 * 
-	 * @param allCombination expected all possible combination of an array in a 2d form
-	 * @param target the value equal to which a row's sum should match in order to be part of reduced solution
-	 * @return the reduced 2d array where each row's sum is equal to target
-	 */
-	private static int[][] reduceAsPerTarget(int[][] allCombination, int target) {
-		int[][] reducedArray = new int[allCombination.length][maxColLenght(allCombination)];
-		int j = 0;
-		for (int[] i : allCombination) {
-			if (sum(i) == target) {
-				reducedArray[j] = i;
-				j++;
-			}
-		}
-		return Arrays.copyOfRange(reducedArray, 0, j); // Splice
-	}
-
-	/**
-	 * This method is used to calculate the sum of all value in an integer
-	 * 
-	 * @param a the array of integer for which sum has to be found
-	 * @return the sum of the array
-	 */
-	private static int sum(int a[]) {
-		int sum = 0;
-		for (int k : a) {
-			sum += k;
-		}
-		return sum;
+		_findFirstCombinationSolution(combination);
 	}
 
 }
