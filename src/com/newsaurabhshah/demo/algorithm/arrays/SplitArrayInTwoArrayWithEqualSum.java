@@ -199,6 +199,7 @@ public class SplitArrayInTwoArrayWithEqualSum {
 	 */
 	public static void main(String[] args) {
 		int a[] = { 11, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+		long startTime = System.nanoTime();
 		int sumA = _sum(a);
 		if (sumA % 2 != 0) {
 			System.out.println("Not Possible!");
@@ -208,6 +209,9 @@ public class SplitArrayInTwoArrayWithEqualSum {
 		int[][] combination = _generateAllPossibleValidCombination(a, sumA / 2);
 		// Query: Find First Solution
 		_findFirstCombinationSolution(combination);
+		long endTime = System.nanoTime();
+		long timeTaken = (endTime - startTime);
+		System.out.println("Took " + timeTaken + " ns or " + (double) timeTaken / 1000000000 + " sec");
 	}
 
 }
